@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <math.h>
+
+#define N 4
+#define ATTR 2
+
+int main() {
+    int i, j, k, choice;
+    double x[N][ATTR] = {
+        {1.0, 2.0},
+        {2.0, 3.0},
+        {5.0, 5.0},
+        {6.0, 4.0}
+    };
+
+    double d, sum, dot, norm1, norm2;
+    double p, diff, matrix[N][N];
+
+    printf("DISSIMILARITY MATRIX\n");
+    printf("1. Euclidean Distance\n");
+    printf("2. Manhattan Distance\n");
+    printf("3. Minkowski Distance\n");
+    printf("4. Cosine Distance\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+
+    if (choice < 1 || choice > 4) {
+        printf("Invalid choice.\n");
+        return 1;
+    }
+
+    if (choice == 3) {
+        printf("Enter Minkowski parameter p (> 0): ");
+        scanf("%lf", &p);
+
+        if (p <= 0) {
+            printf("p must be positive.\n");
+            return 1;
+        }
+    }
+
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            sum = 0;
+            dot = 0;
+            norm1 = 0;
+            norm2 = 0;
+
+            for (k = 0; k < ATTR; k++) {
+                diff = fabs(x[i][k] - x[j][k]);
+
+                if (choice == 1)
+                    sum += diff * diff;
+
+                else if (choice == 2)
+                    sum += diff;
+
+                else if (choice == 3)
+                    sum += pow(diff, p);
+
+                else {
+                    dot += x[i][k] * x[j][k];
+                    norm1 += x[i][k] * x[i][k];
+                    norm2 += x[j][k] * x[j][k];
+                }
+            }
+
+            if (choice == 1)
+                d = sqrt(sum);
+
+            else if (choice == 2)
+                d = sum;
+
+            else if (choice == 3)
+                d = pow(sum, 1.0 / p);
+
+            else {
+                if (norm1 == 0 || norm2 == 0)
+                    d = (norm1 == norm2) ? 0.0 : 1.0;
+                else
+                    d = 1.0 - dot / (sqrt(norm1) * sqrt(norm2));
+            }
+
+            matrix[i][j] = d;
+        }
+    }
+
+    printf("\nDistance Matrix:\n\n");
+    printf("       A       B       C       D\n");
+
+    for (i = 0; i < N; i++) {
+        printf("%c  ", 'A' + i);
+
+        for (j = 0; j < N; j++)
+            printf("%7.2f ", matrix[i][j]);
+
+        printf("\n");
+    }
+
+    return 0;
+}
